@@ -36,7 +36,7 @@ angular.module('app').controller('mapDirectiveController', ['$scope', 'dataServi
             
           var geoQuery = dataService.getGeoFireNode().query({
                     center: [40.440625, -79.995886],
-                    radius: 12.5
+                    radius: 50
                 });
         
             geoQuery.on("key_entered", function(key, location) {
