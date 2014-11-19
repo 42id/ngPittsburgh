@@ -67,16 +67,36 @@
     angular.module('app').factory('dataService', ['$firebase','$q', function($firebase,$q){
     
     var firebaseRef= new Firebase("https://popping-torch-4767.firebaseio.com/");
+        var geoFire = new GeoFire(firebaseRef.child("_geofire"));
 
     var getFirebaseRoot = function(){
       return firebaseRef;
     };
     
-   var addData = function(data){
-    // persist our data to firebase
-        var ref = getFirebaseRoot().child("FoodTrucks");    
-        return  $firebase(ref).$push(data);
-    };
+        var getGeoFireNode = function(){
+            return geoFire;   
+         }
+
+        var addGeofireData = function(data){
+            var defer = $q.defer();  
+
+            geoFire.set(data.key, [data.latitude, data.longitude]).then(function() {
+                defer.resolve();
+              }).catch(function(error) {
+                defer.reject(error);
+            });
+
+            return defer.promise;
+        };
+       var addData = function(data, locationData){
+            // persist our data to firebase
+            var ref = getFirebaseRoot().child("FoodTrucks");  
+
+            return  $firebase(ref).$push(data).then(function(childRef){
+                   addGeofireData({key: childRef.name(), latitude: locationData.latitude, longitude: locationData.longitude});
+            });
+        };
+
     
     var getData = function(){
     
@@ -89,7 +109,8 @@
     var service = {
         addData : addData,
         getData: getData,
-        getFirebaseRoot: getFirebaseRoot            
+        getFirebaseRoot: getFirebaseRoot   ,
+        getGeoFireNode: getGeoFireNode
     };
     
     return service;

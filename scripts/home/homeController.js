@@ -28,9 +28,11 @@
         
         vm.save = function(){
     
-     dataService.addData({name: vm.name, text: vm.text, address: vm.location.address});
+              
+        dataService.addData({name: vm.name, text: vm.text, address: vm.location.address}, 
+                        {latitude: vm.location.latitude, longitude: vm.location.longitude});
     
-}
+        }
         
     }
 })();
